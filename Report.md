@@ -1,15 +1,21 @@
-Engineering Skills Project Report
+Identifying and Reducing Bot Traffic for a Music Media Startup
 
-Tackling Bot Traffic for a Growing Music Startup
+To investigate frequent downtime issues faced by a small music media startup, I analysed over 432,000 server log entries spanning four days. While the average user made between 1–50 requests, the data showed that 16 IP addresses alone generated over 36,000 requests — around 8.3% of all traffic — with clear bot-like patterns.
 
-As part of this project, I was tasked with helping a small music media startup investigate why their website was crashing so often. After looking into the server logs, it became clear that certain pages were getting hit thousands of times — for example, /episodes/ep-42-synthesizer-history, /contact, and /about had each been accessed over 15,000 times.
+Key findings included automated activity during low- and high-traffic periods. For example:
+	•	35.185.0.156 scraped thousands of unique endpoints during off-peak hours (5–5:30am),
+	•	IPs in the 45.133.1.x range ran systematic API enumeration during working hours,
+	•	The 194.168.1.x range spiked traffic at peak lunchtime,
+	•	And credential stuffing attempts from 185.220.x.x targeted login endpoints in the evening.
 
-What stood out even more was that a handful of IP addresses were behind a large portion of the traffic. IPs like 45.133.1.1 and 45.133.1.2 had made more than 5,000 requests each in a very short period. That’s not something a regular user would do. It pointed strongly to automated traffic, most likely bots. With such a small engineering team in place, this kind of activity was pushing the site to its limits and getting in the way of actual users.
+Bots typically used limited or suspicious user-agents (e.g. python-requests, curl) and caused a high number of 404 and 429 errors, indicating brute-force endpoint scanning and existing but insufficient rate limiting.
 
-To help fix this, I explored a few practical and budget-friendly options the team could implement:
-	•	Limit how often each IP can access the site, using a technique called rate limiting
-	•	Block obvious bot traffic by looking at their patterns, like suspicious user agents or repeated behaviour
-	•	Use Cloudflare’s free tools to filter out harmful traffic before it even reaches the site
-	•	Set up simple monitoring scripts that can catch unusual traffic spikes early on
+Recommendations
 
-Together, these steps would help the team take back control of their traffic, keep the site more stable, and spend less time firefighting outages.
+To quickly and cost-effectively reduce strain on the servers and improve uptime, I propose the following:
+	•	Block identified IP ranges: Removing traffic from the top 16 IPs will reduce over 36,000 unnecessary requests.
+	•	Rate limiting with Nginx: Restrict IPs to 10–20 requests per minute to mitigate brute-force and scraping attempts.
+	•	User-Agent filtering: Block obvious bot signatures like python-requests, scraper, or bot.
+	•	Cloudflare WAF (Free or Pro Tier): Add a protective layer to detect and filter malicious traffic before it hits the origin server.
+
+Combined, these actions will significantly reduce downtime and allow the three-person engineering team to focus on growth, not firefighting. This solution is scalable, low-maintenance, and can be implemented at little to no cost.
